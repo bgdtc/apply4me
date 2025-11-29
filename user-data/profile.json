@@ -1,0 +1,29 @@
+{
+  "firstName": "John",
+  "lastName": "DOE",
+  "email": "john.doe@example.com",
+  "phone": "your-phone-numer",
+  "cvPath": "user-data/your_curriculum_vitae.pdf",
+  "headline": "your role",
+  "summary": "your summary",
+  "experience": "your experience details",
+  "skills": [
+    "TypeScript",
+    "AWS",
+    "GCP",
+    "Terraform",
+    "GraphQL",
+    "Express",
+    "React",
+    "React Native",
+    "PostgreSQL",
+    "ClickHouse",
+    "Apache Airflow",
+    "Node.js",
+    "Microservices",
+    "API Design",
+    "Data Engineering",
+    "Cloud Architecture"
+  ],
+  "linkedInUrl": "your-linkedin-profile-url"
+}
