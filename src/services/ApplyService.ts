@@ -217,12 +217,44 @@ export class ApplyService {
                  
                  // Check if already filled
                  const val = await input.inputValue().catch(() => '');
-                 if (val) continue;
-
+                 
+                 // Special handling for "0" values in experience fields
+                 let shouldRefill = false;
                  const label = await modal.locator(`label[for="${id}"]`).innerText().catch(() => '');
                  if (!label) continue;
 
-                 const answer = await this.ai.generateAnswer(label);
+                 if (val) {
+                     if (val === '0') {
+                         // Check if it looks like an experience question
+                         const isExperienceQuestion = /experience|years|années|ans/i.test(label);
+                         if (isExperienceQuestion) {
+                             console.log(`Found '0' value in experience field ("${label}"), refilling...`);
+                             shouldRefill = true;
+                             await input.fill(''); // Clear the 0
+                         } else {
+                             continue; // Keep the 0 for non-experience fields
+                         }
+                     } else {
+                         continue; // Keep other pre-filled values
+                     }
+                 }
+
+                 let answer = await this.ai.generateAnswer(label);
+                 
+                 // If we are refilling a numeric experience field, ensure we get a number
+                 // and if the AI returns something non-numeric or too low, fallback to user preference
+                 if (shouldRefill) {
+                     // Simple heuristic: if the answer is not a number or is 0, force a realistic value
+                     // Based on user request: "3 to 6 or 8"
+                     const num = parseInt(answer.replace(/\D/g, ''));
+                     if (isNaN(num) || num === 0) {
+                         // Calculate a random reasonable number between 3 and 6 as a fallback
+                         // or based on the "Senior" title in profile (~4-5 years usually)
+                         const randomExp = Math.floor(Math.random() * (6 - 3 + 1) + 3); // 3 to 6
+                         answer = randomExp.toString();
+                     }
+                 }
+
                  await input.fill(answer);
              } catch (e) {
                  // Element probably detached, ignore
